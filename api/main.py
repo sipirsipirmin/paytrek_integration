@@ -63,6 +63,7 @@ def make_sale():
         This function makes sale. Comminications paytrek sandbox.
         Creates sale object and makes payment.
     '''
+    import ipdb; ipdb.set_trace()
     is_ok, dict_of_content = create_sale()
     if is_ok:
         make_payment(dict_of_content['sale_token'])
