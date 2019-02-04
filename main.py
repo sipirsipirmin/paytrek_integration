@@ -1,14 +1,14 @@
 import requests
 from flask import Flask
-from settings import  SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
+from settings import SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
+from settings import SALE_CREATION_URL, CHARGE_URL, SALE_DETAILS_URL
 
 app = Flask(__name__)
 
 
 def create_sale():
-    sale_creation_url = 'https://sandbox.paytrek.com/api/v2/sale/'
     response = requests.post(
-        sale_creation_url,
+        SALE_CREATION_URL,
         data=SAMPLE_DATA,
         headers=HEADERS,
         auth=APIKEY_AND_SECRETKEY,
@@ -20,7 +20,6 @@ def create_sale():
 
 
 def make_payment(sale_token):
-    payment_url = 'https://sandbox.paytrek.com/api/v2/charge/'
     payment_info = ''' {
         "number": "4508034508034509",
         "expiration": "12/2020",
@@ -29,7 +28,7 @@ def make_payment(sale_token):
         "sale_token":"%s"
     } ''' %(sale_token,)
     requests.post(
-        payment_url,
+        CHARGE_URL,
         headers=HEADERS,
         data=payment_info,
         auth=APIKEY_AND_SECRETKEY,
@@ -43,10 +42,8 @@ def get_sale(sale_id):
         This function returns sale_id' s detail in json format.
         if there is no sale_id lists all sale_id' s.
     '''
-    sale_details = 'https://sandbox.paytrek.com/api/v2/sale/'
-
     response = requests.post(
-        sale_details,
+        SALE_DETAILS_URL,
         data=SAMPLE_DATA,
         headers=HEADERS,
         auth=APIKEY_AND_SECRETKEY
@@ -70,10 +67,8 @@ def make_sale():
 
 @app.route('/api/sales/', methods=['GET'])
 def list_sales():
-    sale_details = 'https://sandbox.paytrek.com/api/v2/sale/'
-
     response = requests.get(
-        sale_details,
+        SALE_DETAILS_URL,
         headers=HEADERS,
         auth=APIKEY_AND_SECRETKEY
     )
@@ -85,6 +80,7 @@ def list_sales():
             result.get('sale_token', 'Not Find'),
             result.get('status', 'Not Find'),
         ))
+        
     return str(temp)
 
 

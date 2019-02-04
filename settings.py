@@ -1,3 +1,6 @@
+SALE_CREATION_URL = 'https://sandbox.paytrek.com/api/v2/sale/'
+CHARGE_URL = 'https://sandbox.paytrek.com/api/v2/charge/'
+SALE_DETAILS_URL = 'https://sandbox.paytrek.com/api/v2/sale/'
 SAMPLE_DATA = '''
     {
         "amount": 24,
