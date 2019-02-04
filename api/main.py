@@ -1,6 +1,7 @@
 import logging
 import requests
 from flask import Flask
+from flask import request
 from settings import SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
 from settings import SALE_CREATION_URL, CHARGE_URL, SALE_DETAILS_URL
 
@@ -21,21 +22,14 @@ def create_sale():
     return True, response.json()
 
 
-def make_payment(sale_token):
-    payment_info = ''' {
-        "number": "4508034508034509",
-        "expiration": "12/2020",
-        "cvc":"000",
-        "card_holder_name":"John Doe",
-        "sale_token":"%s"
-    } ''' %(sale_token,)
-    requests.post(
+def make_payment(card_info):
+    response = requests.post(
         CHARGE_URL,
         headers=HEADERS,
-        data=payment_info,
+        data=card_info,
         auth=APIKEY_AND_SECRETKEY,
     )
-    return True
+    return response
 
 
 @app.route('/api/sale/<int:sale_id>/', methods=['GET'])
@@ -63,14 +57,35 @@ def make_sale():
         This function makes sale. Comminications paytrek sandbox.
         Creates sale object and makes payment.
     '''
-    import ipdb; ipdb.set_trace()
+    purchased_product_list = [i for i in request.values \
+                                                if i.startswith('product')]
     is_ok, dict_of_content = create_sale()
+    try:
+        card_info = ''' {
+            "number": "%s",
+            "expiration": "%s/%s",
+            "cvc":"%s",
+            "card_holder_name":"%s",
+            "sale_token":"%s"
+        } ''' %(request.values['card_number'],
+                request.values['ex_month'],
+                request.values['ex_year'],
+                request.values['cvv'],
+                request.values['name'],
+                dict_of_content['sale_token'],)
+    except KeyError:
+        return "400 - Missing card information"
+
     if is_ok:
-        make_payment(dict_of_content['sale_token'])
+        response = make_payment(card_info)
     else:
         logging.warning('%s is not_ok in make_sale' %(dict_of_content,))
         return str(response.status_code)
-    return "200"
+    
+    if response.status_code != 200:
+        return "Something happened<br>" + str(response.content)
+
+    return str(response.json()["succeeded"])
 
 
 @app.route('/api/sales/', methods=['GET'])
@@ -89,6 +104,7 @@ def list_sales():
                 result.get('sale_token', 'Not Find'),
                 result.get('status', 'Not Find'),
             ))
+
     except Exception as e:
         return "Something went wrong. Please contact your business partner"
         logging.error(e)
