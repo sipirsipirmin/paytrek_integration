@@ -99,15 +99,16 @@ def list_sales():
         results = response.json()['results']
         temp = []
         for result in results:
-            temp.append((
-                result.get('created_at', 'Not Find'),
-                result.get('sale_token', 'Not Find'),
-                result.get('status', 'Not Find'),
-            ))
+            temp.append({
+                result.get('sale_token', 'Not Find'): {
+                    'created_at': result.get('created_at', 'Not Find'),
+                    'status': result.get('status', 'Not Find'),
+                }
+            })
     except Exception as e:
         return "Something went wrong. Please contact your business partner"
         logging.error(e)
-    return '<br>'.join([str(i) for i in temp])
+    return jsonify(temp)
 
 
 if __name__ == '__main__':
