@@ -38,7 +38,6 @@ def get_sale(sale_id):
         This function returns sale_id' s detail in json format.
         if there is no sale_id lists all sale_id' s.
     '''
-
     try:
         response = requests.get(
             SALE_DETAILS_URL + sale_id,
@@ -48,7 +47,7 @@ def get_sale(sale_id):
     except Exception as e:
         logging.error(e)
         return "Something went wrong. Please contact your business partner"
-    
+
     return jsonify(response.json())
 
 
@@ -105,7 +104,6 @@ def list_sales():
                 result.get('sale_token', 'Not Find'),
                 result.get('status', 'Not Find'),
             ))
-
     except Exception as e:
         return "Something went wrong. Please contact your business partner"
         logging.error(e)
