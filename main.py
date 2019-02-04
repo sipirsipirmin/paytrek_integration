@@ -1,9 +1,11 @@
+import logging
 import requests
 from flask import Flask
 from settings import SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
 from settings import SALE_CREATION_URL, CHARGE_URL, SALE_DETAILS_URL
 
 app = Flask(__name__)
+logging.basicConfig(filename='main.log',level=logging.DEBUG)
 
 
 def create_sale():
@@ -42,13 +44,16 @@ def get_sale(sale_id):
         This function returns sale_id' s detail in json format.
         if there is no sale_id lists all sale_id' s.
     '''
-    response = requests.post(
-        SALE_DETAILS_URL,
-        data=SAMPLE_DATA,
-        headers=HEADERS,
-        auth=APIKEY_AND_SECRETKEY
-    )
-
+    try:
+        response = requests.post(
+            SALE_DETAILS_URL,
+            data=SAMPLE_DATA,
+            headers=HEADERS,
+            auth=APIKEY_AND_SECRETKEY
+        )
+    except Exception as e:
+        return "Something went wrong. Please contact your business partner"
+        logging.error(e)
     return response.json()
 
 
@@ -61,26 +66,31 @@ def make_sale():
     is_ok, dict_of_content = create_sale()
     if is_ok:
         make_payment(dict_of_content['sale_token'])
-
+    else:
+        logging.warning('%s is not_ok in make_sale' %(dict_of_content,))
+        return str(response.status_code)
     return "200"
 
 
 @app.route('/api/sales/', methods=['GET'])
 def list_sales():
-    response = requests.get(
-        SALE_DETAILS_URL,
-        headers=HEADERS,
-        auth=APIKEY_AND_SECRETKEY
-    )
-    results = response.json()['results']
-    temp = []
-    for result in results:
-        temp.append((
-            result.get('created_at', 'Not Find'),
-            result.get('sale_token', 'Not Find'),
-            result.get('status', 'Not Find'),
-        ))
-        
+    try:
+        response = requests.get(
+            SALE_DETAILS_URL,
+            headers=HEADERS,
+            auth=APIKEY_AND_SECRETKEY
+        )
+        results = response.json()['results']
+        temp = []
+        for result in results:
+            temp.append((
+                result.get('created_at', 'Not Find'),
+                result.get('sale_token', 'Not Find'),
+                result.get('status', 'Not Find'),
+            ))
+    except Exception as e:
+        return "Something went wrong. Please contact your business partner"
+        logging.error(e)
     return str(temp)
 
 
