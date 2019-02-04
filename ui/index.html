@@ -3,30 +3,30 @@
   </head>
 
   <body>
-    <form method="post" target="http://localhost:5000/api/make_sale">
+    <form method="post" action="http://localhost:5000/api/make_sale/">
 
       <input type="checkbox" name="product1" value="Bike"> Bike $100 <br>
       <input type="checkbox" name="product2" value="Car"> Car $10<br>
-      <input type="checkbox" name="product3" value="Motocycle" checked>Motocycle $100<br><br>
+      <input type="checkbox" name="product3" value="Motocycle">Motocycle $100<br><br>
       <table>
         <tr>
           <td> Name </td>
-          <td><input></input></td>
+          <td><input name='name'></input></td>
         </tr>
         <tr>
           <td> Card Number </td>
-          <td> <input></input></td>
+          <td> <input name='card_number'></input></td>
         </tr>
         <tr>
           <td> CVV </td>
-          <td><input></input></td>
+          <td><input name='cvv'></input></td>
         </tr>
         <tr>
           <td> Expiration Month </td>
-          <td><input></input></td>
+          <td><input name='ex_month'></input></td>
 
           <td> Expiration Year </td>
-          <td><input></input></td>
+          <td><input name='ex_year'></input></td>
         </tr>
         <tr>
           <td></td>
@@ -35,6 +35,6 @@
 
       </table>
 
-    </body>
+    </form>
   </body>
 </html>

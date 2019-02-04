@@ -1,7 +1,7 @@
 import logging
 import requests
 from flask import Flask
-from flask import request
+from flask import request, jsonify
 from settings import SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
 from settings import SALE_CREATION_URL, CHARGE_URL, SALE_DETAILS_URL
 
@@ -32,23 +32,24 @@ def make_payment(card_info):
     return response
 
 
-@app.route('/api/sale/<int:sale_id>/', methods=['GET'])
+@app.route('/api/sale/<sale_id>/', methods=['GET'])
 def get_sale(sale_id):
     '''
         This function returns sale_id' s detail in json format.
         if there is no sale_id lists all sale_id' s.
     '''
+
     try:
-        response = requests.post(
-            SALE_DETAILS_URL,
-            data=SAMPLE_DATA,
+        response = requests.get(
+            SALE_DETAILS_URL + sale_id,
             headers=HEADERS,
             auth=APIKEY_AND_SECRETKEY
         )
     except Exception as e:
-        return "Something went wrong. Please contact your business partner"
         logging.error(e)
-    return response.json()
+        return "Something went wrong. Please contact your business partner"
+    
+    return jsonify(response.json())
 
 
 @app.route('/api/make_sale/', methods=['POST'])
@@ -81,7 +82,7 @@ def make_sale():
     else:
         logging.warning('%s is not_ok in make_sale' %(dict_of_content,))
         return str(response.status_code)
-    
+
     if response.status_code != 200:
         return "Something happened<br>" + str(response.content)
 
@@ -108,7 +109,7 @@ def list_sales():
     except Exception as e:
         return "Something went wrong. Please contact your business partner"
         logging.error(e)
-    return str(temp)
+    return '<br>'.join([str(i) for i in temp])
 
 
 if __name__ == '__main__':
