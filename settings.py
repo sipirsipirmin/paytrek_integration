@@ -30,12 +30,11 @@ SAMPLE_DATA = '''
         }
     }
 '''
-DATA_TEMPLATE = '''
-    {
+DATA_TEMPLATE = {
         "amount": 24,
         "order_id": "1467034250",
-        "secure_option": false,
-        "pre_auth": false,
+        "secure_option": False,
+        "pre_auth": False,
         "billing_address": "123 Market St. San Francisco",
         "billing_city": "San Francisco",
         "billing_country": "US",
@@ -48,17 +47,16 @@ DATA_TEMPLATE = '''
         "installment": 1,
         "items": [
             {
-              "unit_price": %s,
+              "unit_price": 1,
               "quantity": 1,
-              "name": "%s",
+              "name": "fiki",
               "photo": "https://sandbox.paytrek.com/statics/images/testing.jpg"
             }
         ],
         "sale_data": {
             "merchant_name": "Ted"
         }
-    }
-'''
+}
 HEADERS = {
     'Content-Type': 'application/json',
 }
