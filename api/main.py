@@ -10,6 +10,9 @@ logging.basicConfig(filename='main.log',level=logging.DEBUG)
 
 
 def create_sale():
+    '''
+    Creates sale object in Paytrek server and gets this objects information.
+    '''
     response = requests.post(
         SALE_CREATION_URL,
         data=SAMPLE_DATA,
@@ -23,6 +26,12 @@ def create_sale():
 
 
 def make_payment(card_info):
+    '''
+    This function makes payment for created sale object.
+    Params:
+        card_info: which includes credit/debit card information and
+            sale token(from sale object)
+    '''
     response = requests.post(
         CHARGE_URL,
         headers=HEADERS,
@@ -32,15 +41,15 @@ def make_payment(card_info):
     return response
 
 
-@app.route('/api/sale/<sale_id>/', methods=['GET'])
-def get_sale(sale_id):
+@app.route('/api/sale/<sale_token>/', methods=['GET'])
+def get_sale(sale_token):
     '''
-        This function returns sale_id' s detail in json format.
-        if there is no sale_id lists all sale_id' s.
+        This function returns sale object detail in json format which has
+        given sale_token.
     '''
     try:
         response = requests.get(
-            SALE_DETAILS_URL + sale_id,
+            SALE_DETAILS_URL + sale_token,
             headers=HEADERS,
             auth=APIKEY_AND_SECRETKEY
         )
@@ -54,7 +63,7 @@ def get_sale(sale_id):
 @app.route('/api/make_sale/', methods=['POST'])
 def make_sale():
     '''
-        This function makes sale. Comminications paytrek sandbox.
+        This function makes sale. Comminicates paytrek sandbox.
         Creates sale object and makes payment.
     '''
     purchased_product_list = [i for i in request.values \
@@ -88,7 +97,7 @@ def make_sale():
     return str(response.json()["succeeded"])
 
 
-@app.route('/api/sales/', methods=['GET'])
+@app.route('/api/sale/', methods=['GET'])
 def list_sales():
     try:
         response = requests.get(
