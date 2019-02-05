@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from flask import request, jsonify
 from settings import SAMPLE_DATA, HEADERS, APIKEY_AND_SECRETKEY
 from settings import SALE_CREATION_URL, CHARGE_URL, SALE_DETAILS_URL
-from settings import DATA_TEMPLATE
+from settings import DATA_TEMPLATE, DATABASE
 
 app = Flask(__name__)
 logging.basicConfig(filename='main.log',level=logging.DEBUG)
@@ -78,7 +78,7 @@ def make_sale():
     template['billing_country'] = request.form['billing_country']
     template['customer_email'] = request.form['customer_email']
 
-    with sqlite3.connect('database.db') as conn:
+    with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
         cur.execute('''
             SELECT * FROM products;
@@ -158,7 +158,7 @@ def list_sales():
 
 @app.route('/', methods=['GET'])
 def index():
-    with sqlite3.connect('database.db') as conn:
+    with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
         cur.execute('''
             SELECT * FROM products;
@@ -168,7 +168,7 @@ def index():
 
 
 if __name__ == '__main__':
-    with sqlite3.connect('database.db') as conn:
+    with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
         cur.execute('''
             CREATE TABLE IF NOT EXISTS products(name TEXT, amount INT, price FLOAT)
