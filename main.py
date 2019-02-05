@@ -70,19 +70,17 @@ def make_sale():
         Creates sale object and makes payment.
     '''
     template = DATA_TEMPLATE
-    template['customer_first_name'] = request.form.get('customer_first_name', None)
-    template['customer_last_name'] = request.form['customer_last_name']
-    template['billing_address'] = request.form['billing_address']
-    template['billing_state'] = request.form['billing_state']
-    template['billing_city'] = request.form['billing_city']
-    template['billing_country'] = request.form['billing_country']
-    template['customer_email'] = request.form['customer_email']
+    template['billing_city'] = request.form.get('billing_city', '')
+    template['billing_state'] = request.form.get('billing_state', '')
+    template['customer_email'] = request.form.get('customer_email', '')
+    template['billing_country'] = request.form.get('billing_country', '')
+    template['billing_address'] = request.form.get('billing_address', '')
+    template['customer_last_name'] = request.form.get('customer_last_name', '')
+    template['customer_first_name'] = request.form.get('customer_first_name', '')
 
     with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
-        cur.execute('''
-            SELECT * FROM products;
-        ''')
+        cur.execute('''SELECT * FROM products;''')
 
         list_of_all_products = cur.fetchall()
     items = []
@@ -126,7 +124,6 @@ def make_sale():
     else:
         logging.warning('%s is not_ok in make_sale' %(dict_of_content,))
         return str(response.status_code)
-
     if response.status_code != 200:
         return "Something happened<br>" + str(response.content)
 
@@ -171,7 +168,9 @@ if __name__ == '__main__':
     with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
         cur.execute('''
-            CREATE TABLE IF NOT EXISTS products(name TEXT, amount INT, price FLOAT)
+            CREATE TABLE IF NOT EXISTS products(name TEXT,
+                                                amount INT,
+                                                price FLOAT)
         ''')
         conn.commit()
     app.run()
