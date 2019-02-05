@@ -78,13 +78,13 @@ def make_sale():
     template['billing_country'] = request.form['billing_country']
     template['customer_email'] = request.form['customer_email']
 
-    conn = sqlite3.connect('database.db')
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT * FROM products;
-    ''')
+    with sqlite3.connect('database.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT * FROM products;
+        ''')
 
-    list_of_all_products = cur.fetchall()
+        list_of_all_products = cur.fetchall()
     items = []
     for name, total_amount, price in list_of_all_products:
         requested_quantity_of_product = request.form.get(name, False)
@@ -120,7 +120,7 @@ def make_sale():
                 dict_of_content['sale_token'],)
     except KeyError:
         return "400 - Missing card information"
-    
+
     if is_ok:
         response = make_payment(card_info)
     else:
@@ -158,21 +158,20 @@ def list_sales():
 
 @app.route('/', methods=['GET'])
 def index():
-    conn = sqlite3.connect('database.db')
-    cur = conn.cursor()
-    cur.execute('''
-        SELECT * FROM products;
-    ''')
-
-    list_of_products = cur.fetchall()
+    with sqlite3.connect('database.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT * FROM products;
+        ''')
+        list_of_products = cur.fetchall()
     return render_template('index.html', products=list_of_products)
 
 
 if __name__ == '__main__':
-    conn = sqlite3.connect('database.db')
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS products(name TEXT, amount INT, price FLOAT)
-    ''')
-    conn.commit()
+    with sqlite3.connect('database.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS products(name TEXT, amount INT, price FLOAT)
+        ''')
+        conn.commit()
     app.run()
