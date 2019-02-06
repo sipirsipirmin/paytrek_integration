@@ -43,6 +43,7 @@ def make_payment(card_info):
     return response
 
 
+
 @app.route('/api/sale/<sale_token>/', methods=['GET'])
 def get_sale(sale_token):
     '''
@@ -63,13 +64,7 @@ def get_sale(sale_token):
     return jsonify(response.json())
 
 
-@app.route('/api/make_sale/', methods=['POST'])
-def make_sale():
-    '''
-        This function makes sale. Comminicates paytrek sandbox.
-        Creates sale object and makes payment.
-    '''
-    template = DATA_TEMPLATE
+def fill_general_information_about_customer(request, template):
     template['billing_city'] = request.form.get('billing_city', '')
     template['billing_state'] = request.form.get('billing_state', '')
     template['customer_email'] = request.form.get('customer_email', '')
@@ -78,6 +73,10 @@ def make_sale():
     template['customer_last_name'] = request.form.get('customer_last_name', '')
     template['customer_first_name'] = request.form.get('customer_first_name', '')
 
+    return template
+
+
+def fill_shopping_basket_field(request, template):
     with sqlite3.connect(DATABASE) as conn:
         cur = conn.cursor()
         cur.execute('''SELECT * FROM products;''')
@@ -101,6 +100,19 @@ def make_sale():
                 pass
 
     template['items'] = items
+
+    return template
+
+
+@app.route('/api/make_sale/', methods=['POST'])
+def make_sale():
+    '''
+        This function makes sale. Comminicates paytrek sandbox.
+        Creates sale object and makes payment.
+    '''
+    template = DATA_TEMPLATE
+    template = fill_general_information_about_customer(request, template)
+    template = fill_shopping_basket_field(request, template)
 
     is_ok, dict_of_content = create_sale()
     try:
@@ -148,8 +160,8 @@ def list_sales():
                 }
             })
     except Exception as e:
-        return "Something went wrong. Please contact your business partner"
         logging.error(e)
+        return "Something went wrong. Please contact your business partner"
     return jsonify(temp)
 
 
